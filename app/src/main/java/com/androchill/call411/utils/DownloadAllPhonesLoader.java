@@ -34,12 +34,12 @@ public class DownloadAllPhonesLoader extends AsyncTaskLoader<List<Phone>> {
             InputStream content = execute.getEntity().getContent();
             BufferedReader br = new BufferedReader(new InputStreamReader(content));
             String s = "";
-            String response = "";
+            StringBuffer response = new StringBuffer();
             while((s = br.readLine()) != null) {
-                response += s;
+                response.append(s);
             }
             Log.d("Download phones", "Downloading complete");
-            data = PhoneJSONParser.parseArray(response);
+            data = PhoneJSONParser.parseArray(response.toString());
             dataIsReady = true;
             return data;
         } catch (IOException e) {
