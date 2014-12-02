@@ -1,4 +1,4 @@
-package com.example.android.io2014.ui;
+package com.androchill.call411.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -13,7 +13,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
-import com.example.android.io2014.R;
+import com.androchill.call411.R;
 
 public class SpotlightView extends View {
     private int mTargetId;

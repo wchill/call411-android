@@ -1,4 +1,4 @@
-package com.example.android.io2014;
+package com.androchill.call411;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -19,20 +19,14 @@ import android.view.ViewOutlineProvider;
 import android.view.WindowInsets;
 import android.widget.ImageView;
 
-import com.example.android.io2014.ui.TransitionListener;
+import com.androchill.call411.ui.TransitionListener;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class DetailActivityL extends AbstractDetailActivity {
 
     @Override
     public void postCreate() {
-        setOutlines(R.id.star_button, R.id.info_button);
         applySystemWindowsBottomInset();
-    }
-
-    @Override
-    public void mapLoaded(Bitmap bitmap) {
-
     }
 
     private void setOutlines(int star, int info) {
@@ -110,7 +104,6 @@ public class DetailActivityL extends AbstractDetailActivity {
                 color.addUpdateListener(new TintListener(hero));
                 color.start();
 
-                findViewById(R.id.info_button).animate().alpha(1.0f);
                 findViewById(R.id.star_button).animate().alpha(1.0f);
 
                 getWindow().getEnterTransition().removeListener(this);
@@ -131,7 +124,6 @@ public class DetailActivityL extends AbstractDetailActivity {
         });
         color.start();
 
-        findViewById(R.id.info_button).animate().alpha(0.0f);
         findViewById(R.id.star_button).animate().alpha(0.0f);
     }
 

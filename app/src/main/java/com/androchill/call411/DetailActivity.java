@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.example.android.io2014;
+package com.androchill.call411;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.graphics.drawable.shapes.OvalShape;
@@ -31,11 +29,10 @@ import android.view.animation.Interpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
-import com.example.android.io2014.ui.AnimatorListener;
-import com.example.android.io2014.ui.SpotlightView;
-import com.example.android.io2014.ui.Utils;
+import com.androchill.call411.ui.AnimatorListener;
+import com.androchill.call411.ui.SpotlightView;
+import com.androchill.call411.ui.Utils;
 import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
 
@@ -52,7 +49,7 @@ public class DetailActivity extends AbstractDetailActivity {
     // The exit animation runs all of this in reverse.
     private ImageView animatedHero;
 
-    private View mapContainer, infoContainer;
+    private View infoContainer;
     private float maskScale = 0;
 
     @Override
@@ -61,7 +58,6 @@ public class DetailActivity extends AbstractDetailActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         spotlight = (SpotlightView) findViewById(R.id.spotlight);
-        mapContainer = findViewById(R.id.map_container);
         infoContainer = findViewById(R.id.info_container);
 
         animatedHero = (ImageView) findViewById(R.id.animated_photo);
@@ -71,13 +67,6 @@ public class DetailActivity extends AbstractDetailActivity {
         ViewHelper.setAlpha(container, 0);
 
         animatedHero.setImageBitmap(photo);
-    }
-
-    @Override
-    public void mapLoaded(Bitmap bitmap) {
-        mapContainer.setVisibility(View.INVISIBLE);
-        spotlight.createShaderB(bitmap);
-        maskScale = spotlight.computeMaskScale(Math.max(spotlight.getHeight(), spotlight.getWidth()) * 4.0f);
     }
 
     @Override
@@ -102,42 +91,7 @@ public class DetailActivity extends AbstractDetailActivity {
     }
 
     public void toggleInformationView(View view) {
-        if (mapContainer.getVisibility() == View.INVISIBLE) {
-            createScaleAnimation(spotlight);
-        } else {
-            createShrinkAnimation(spotlight);
-        }
-    }
 
-    private void createScaleAnimation(final SpotlightView spotlight) {
-        spotlight.setVisibility(View.VISIBLE);
-
-        ObjectAnimator superScale = ObjectAnimator.ofFloat(spotlight, "maskScale", maskScale);
-        superScale.addListener(new AnimatorListener() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                hero.setVisibility(View.INVISIBLE);
-                mapContainer.setVisibility(View.VISIBLE);
-                spotlight.setVisibility(View.GONE);
-            }
-        });
-        superScale.start();
-    }
-
-    private void createShrinkAnimation(final SpotlightView spotlight) {
-        mapContainer.setVisibility(View.INVISIBLE);
-        spotlight.setVisibility(View.VISIBLE);
-        hero.setVisibility(View.VISIBLE);
-        spotlight.setMaskScale(maskScale);
-
-        ObjectAnimator superShrink = ObjectAnimator.ofFloat(spotlight, "maskScale", maskScale, 0.5f);
-        superShrink.addListener(new AnimatorListener() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                spotlight.setVisibility(View.GONE);
-            }
-        });
-        superShrink.start();
     }
 
     @Override
@@ -146,10 +100,6 @@ public class DetailActivity extends AbstractDetailActivity {
             @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
-                View button = findViewById(R.id.info);
-                spotlight.setMaskX(button.getRight() - (button.getWidth() / 2));
-                spotlight.setMaskY(button.getBottom() - (button.getHeight() / 2));
-
                 runEnterAnimation();
 
                 Utils.removeOnGlobalLayoutListenerCompat(spotlight, this);

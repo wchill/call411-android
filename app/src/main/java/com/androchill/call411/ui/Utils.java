@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.io2014.ui;
+package com.androchill.call411.ui;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;

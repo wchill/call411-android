@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.io2014;
+package com.androchill.call411;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -26,13 +26,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.io2014.ui.AnimatedPathView;
-import com.example.android.io2014.ui.AnimatorListener;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.androchill.call411.ui.AnimatedPathView;
+import com.androchill.call411.ui.AnimatorListener;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.view.ViewPropertyAnimator;
 
@@ -54,7 +49,6 @@ public abstract class AbstractDetailActivity extends ActionBarActivity {
 
         colorize(photo);
 
-        setupMap();
         setupText();
 
         postCreate();
@@ -87,34 +81,6 @@ public abstract class AbstractDetailActivity extends ActionBarActivity {
         descriptionView.setText(getIntent().getStringExtra("description"));
     }
 
-    private void setupMap() {
-        final GoogleMap map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-
-        double lat = getIntent().getDoubleExtra("lat", 37.6329946);
-        double lng = getIntent().getDoubleExtra("lng", -122.4938344);
-        float zoom = getIntent().getFloatExtra("zoom", 15);
-
-        LatLng position = new LatLng(lat, lng);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, zoom));
-        map.addMarker(new MarkerOptions().position(position));
-
-        // We need the snapshot of the map to prepare the shader for the circular reveal.
-        // So the map is visible on activity start and then once the snapshot is taken, quickly hidden.
-        map.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                map.snapshot(new GoogleMap.SnapshotReadyCallback() {
-                    @Override
-                    public void onSnapshotReady(Bitmap bitmap) {
-                        mapLoaded(bitmap);
-                    }
-                });
-            }
-        });
-    }
-
-    public abstract void mapLoaded(Bitmap bitmap);
-
     private void colorize(Bitmap photo) {
         Palette palette = Palette.generate(photo);
         applyPalette(palette);
@@ -130,9 +96,6 @@ public abstract class AbstractDetailActivity extends ActionBarActivity {
 
         TextView descriptionView = (TextView) findViewById(R.id.description);
         descriptionView.setTextColor(palette.getLightVibrantColor(res.getColor(R.color.default_light_vibrant)));
-
-        colorButton(R.id.info_button, palette.getDarkMutedColor(res.getColor(R.color.default_dark_muted)),
-                palette.getDarkVibrantColor(res.getColor(R.color.default_dark_vibrant)));
         colorButton(R.id.star_button, palette.getMutedColor(res.getColor(R.color.default_muted)),
                 palette.getVibrantColor(res.getColor(R.color.default_vibrant)));
 

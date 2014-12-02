@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.io2014.ui;
+package com.androchill.call411.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -25,7 +25,7 @@ import android.graphics.PathEffect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import com.example.android.io2014.R;
+import com.androchill.call411.R;
 import com.nineoldandroids.animation.ObjectAnimator;
 
 import java.util.ArrayList;

@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:io="http://schemas.android.com/apk/res-auto"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
 
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context="com.example.android.io2014.DetailActivity">
+    tools:context="com.androchill.call411.DetailActivity">
 
     <LinearLayout
         android:id="@+id/container"
@@ -27,20 +26,6 @@
                 android:scaleType="centerCrop"
                 android:tint="@color/photo_tint"
                 android:transitionName="photo_hero" />
-
-            <ImageButton
-                android:id="@+id/info_button"
-                android:layout_width="@dimen/floating_button_size"
-                android:layout_height="@dimen/floating_button_size"
-                android:layout_gravity="bottom|end"
-                android:layout_marginBottom="@dimen/floating_button_margin"
-                android:layout_marginEnd="@dimen/floating_button_margin"
-                android:alpha="0.0"
-                android:background="@drawable/info_background"
-                android:elevation="@dimen/button_elevation"
-                android:stateListAnimator="@anim/button_raise"
-                android:onClick="showInformation"
-                android:src="@drawable/ic_info" />
 
             <ImageButton
                 android:id="@+id/star_button"
@@ -62,21 +47,9 @@
                 android:layout_height="match_parent"
                 android:visibility="invisible">
 
-                <fragment
-                    android:id="@+id/map"
-                    android:name="com.google.android.gms.maps.SupportMapFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-
-                    map:uiRotateGestures="false"
-                    map:uiScrollGestures="false"
-                    map:uiTiltGestures="false"
-                    map:uiZoomControls="false"
-                    map:uiZoomGestures="false" />
-
             </FrameLayout>
 
-            <com.example.android.io2014.ui.AnimatedPathView
+            <com.androchill.call411.ui.AnimatedPathView
                 android:id="@+id/star_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
