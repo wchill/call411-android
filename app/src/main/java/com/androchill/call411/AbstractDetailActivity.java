@@ -18,24 +18,30 @@ package com.androchill.call411;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
-import com.androchill.call411.ui.AnimatedPathView;
-import com.androchill.call411.ui.AnimatorListener;
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.view.ViewPropertyAnimator;
+import com.androchill.call411.utils.Phone;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+import com.squareup.picasso.Transformation;
 
-public abstract class AbstractDetailActivity extends ActionBarActivity {
+public abstract class AbstractDetailActivity extends ActionBarActivity implements Target {
 
     public ImageView hero;
     public Bitmap photo;
     public View container;
+    public Phone phone;
+
+    public Transformation transformation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +51,46 @@ public abstract class AbstractDetailActivity extends ActionBarActivity {
         hero = (ImageView) findViewById(R.id.photo);
         container = findViewById(R.id.container);
 
-        photo = setupPhoto(getIntent().getIntExtra("photo", R.drawable.photo1));
+        phone = getIntent().getParcelableExtra("phone");
 
-        colorize(photo);
+        transformation = new Transformation() {
+
+            @Override public Bitmap transform(Bitmap source) {
+                int targetWidth = container.getWidth();
+
+                double aspectRatio = (double) source.getHeight() / (double) source.getWidth();
+                int targetHeight = (int) (targetWidth * aspectRatio);
+                Log.d("Transform", Integer.toString(targetWidth));
+                Bitmap result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false);
+                if (result != source) {
+                    // Same bitmap is returned if sizes are the same
+                    source.recycle();
+                }
+                return result;
+            }
+
+            @Override public String key() {
+                return "transformation" + " desiredWidth";
+            }
+        };
+
+        hero.post(new Runnable() {
+
+            @Override
+            public void run() {
+                Picasso.with(AbstractDetailActivity.this)
+                        .load(phone.getImageUrl())
+                        .placeholder(R.drawable.loading_placeholder)
+                        .error(android.R.drawable.stat_notify_error)
+                        .tag("PhoneViewAdapter")
+                        .transform(transformation)
+                        .into(hero);
+            }
+        });
+
+        //photo = setupPhoto();
+
+        //colorize(photo);
 
         setupText();
 
@@ -57,6 +100,23 @@ public abstract class AbstractDetailActivity extends ActionBarActivity {
     }
 
     public abstract void postCreate();
+
+    @Override
+    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+        photo = bitmap;
+        hero.setImageBitmap(photo);
+        colorize(photo);
+    }
+
+    @Override
+    public void onBitmapFailed(Drawable errorDrawable) {
+        hero.setImageDrawable(errorDrawable);
+    }
+
+    @Override
+    public void onPrepareLoad(Drawable placeHolderDrawable) {
+        hero.setImageDrawable(placeHolderDrawable);
+    }
 
     @Override
     public void onBackPressed() {
@@ -74,11 +134,69 @@ public abstract class AbstractDetailActivity extends ActionBarActivity {
     }
 
     private void setupText() {
+        TableLayout tablelayout = (TableLayout) findViewById(R.id.table);
+        tablelayout.setColumnShrinkable(1,true);
         TextView titleView = (TextView) findViewById(R.id.title);
-        titleView.setText(getIntent().getStringExtra("title"));
+        TextView manufacturerView = (TextView) findViewById(R.id.detail_manufacturer_text);
+        TextView systemView = (TextView) findViewById(R.id.detail_system_text);
+        TextView processorView = (TextView) findViewById(R.id.detail_processor_text);
+        TextView ramView = (TextView) findViewById(R.id.detail_ram_text);
+        TextView screenSizeView = (TextView) findViewById(R.id.detail_screen_size_text);
+        TextView screenResolutionView = (TextView) findViewById(R.id.detail_screen_resolution_text);
+        TextView batteryCapacityView = (TextView) findViewById(R.id.detail_battery_capacity_text);
+        TextView talkTimeView = (TextView) findViewById(R.id.detail_talk_time_text);
+        TextView cameraMegapixelsView = (TextView) findViewById(R.id.detail_camera_megapixels_text);
+        TextView priceView = (TextView) findViewById(R.id.detail_price_text);
+        TextView weightView = (TextView) findViewById(R.id.detail_weight_text);
+        TextView storageView = (TextView) findViewById(R.id.detail_storage_options_text);
+        TextView dimensionsView = (TextView) findViewById(R.id.detail_dimensions_text);
+        TextView carrierView = (TextView) findViewById(R.id.detail_carrier_text);
+        TextView networkFrequenciesView = (TextView) findViewById(R.id.detail_network_frequencies_text);
 
-        TextView descriptionView = (TextView) findViewById(R.id.description);
-        descriptionView.setText(getIntent().getStringExtra("description"));
+        titleView.setText(phone.getModelNumber());
+        manufacturerView.setText(phone.getManufacturer());
+        systemView.setText(phone.getSystem());
+        processorView.setText(phone.getProcessor());
+        if(phone.getRam() < 0) {
+            ramView.setText("No data available");
+        } else {
+            ramView.setText(Integer.toString(phone.getRam()) + " MB");
+        }
+        if(phone.getScreenSize() < 0) {
+            screenSizeView.setText("No data available");
+        } else {
+            screenSizeView.setText(Double.toString(phone.getScreenSize()) + " inches");
+        }
+        screenResolutionView.setText(phone.getScreenResolution());
+        if(phone.getBatteryCapacity() < 0) {
+            batteryCapacityView.setText("No data available");
+        } else {
+            batteryCapacityView.setText(Integer.toString(phone.getBatteryCapacity()) + " mAh");
+        }
+        if(phone.getTalkTime() < 0) {
+            talkTimeView.setText("No data available");
+        } else {
+            talkTimeView.setText(Integer.toString((int)phone.getTalkTime()) + " minutes");
+        }
+        if(phone.getCameraMegapixels() < 0) {
+            cameraMegapixelsView.setText("No data available");
+        } else {
+            cameraMegapixelsView.setText(Double.toString(phone.getCameraMegapixels()) + " megapixels");
+        }
+        if(phone.getPrice() < 0) {
+            priceView.setText("No data available");
+        } else {
+            priceView.setText("$" + Integer.toString(phone.getPrice()));
+        }
+        if(phone.getWeight() < 0) {
+            weightView.setText("No data available");
+        } else {
+            weightView.setText(Double.toString(phone.getWeight()) + " oz");
+        }
+        storageView.setText(phone.getStorageOptions());
+        dimensionsView.setText(phone.getDimensions());
+        carrierView.setText(phone.getCarrier());
+        networkFrequenciesView.setText(phone.getNetworkFrequencies());
     }
 
     private void colorize(Bitmap photo) {
@@ -93,54 +211,7 @@ public abstract class AbstractDetailActivity extends ActionBarActivity {
 
         TextView titleView = (TextView) findViewById(R.id.title);
         titleView.setTextColor(palette.getVibrantColor(res.getColor(R.color.default_vibrant)));
-
-        TextView descriptionView = (TextView) findViewById(R.id.description);
-        descriptionView.setTextColor(palette.getLightVibrantColor(res.getColor(R.color.default_light_vibrant)));
-        colorButton(R.id.star_button, palette.getMutedColor(res.getColor(R.color.default_muted)),
-                palette.getVibrantColor(res.getColor(R.color.default_vibrant)));
-
-        AnimatedPathView star = (AnimatedPathView) findViewById(R.id.star_container);
-        star.setFillColor(palette.getVibrantColor(R.color.default_vibrant));
-        star.setStrokeColor(palette.getLightVibrantColor(res.getColor(R.color.default_light_vibrant)));
     }
-
-    public abstract void colorButton(int id, int bgColor, int tintColor);
-
-    private Bitmap setupPhoto(int resource) {
-        Bitmap bitmap = MainActivity.sPhotoCache.get(resource);
-        hero.setImageBitmap(bitmap);
-        return bitmap;
-    }
-
-    public void showStar(View view) {
-        toggleStarView();
-    }
-
-    private void toggleStarView() {
-        final AnimatedPathView starContainer = (AnimatedPathView) findViewById(R.id.star_container);
-
-        if (starContainer.getVisibility() == View.INVISIBLE) {
-            ViewPropertyAnimator.animate(hero).alpha(0.2f);
-            ViewPropertyAnimator.animate(starContainer).alpha(1);
-            starContainer.setVisibility(View.VISIBLE);
-            starContainer.reveal();
-        } else {
-            ViewPropertyAnimator.animate(hero).alpha(1);
-            ViewPropertyAnimator.animate(starContainer).alpha(0).setListener(new AnimatorListener() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    starContainer.setVisibility(View.INVISIBLE);
-                    ViewPropertyAnimator.animate(starContainer).setListener(null);
-                }
-            });
-        }
-    }
-
-    public void showInformation(View view) {
-        toggleInformationView(view);
-    }
-
-    public abstract void toggleInformationView(View view);
 
     public abstract void setupEnterAnimation();
 

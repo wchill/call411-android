@@ -62,20 +62,20 @@ public class PhoneJSONParser {
         try {
             builder.setModelNumber(phoneObj.getString("model_number"));
             builder.setRam(phoneObj.optInt("ram", -1));
-            builder.setProcessor(phoneObj.optString("processor", "No data"));
-            builder.setManufacturer(phoneObj.optString("manufacturer", "No data"));
-            builder.setSystem(phoneObj.optString("system", "No data"));
+            builder.setProcessor(phoneObj.optString("processor", "No data available"));
+            builder.setManufacturer(phoneObj.optString("manufacturer", "No data available"));
+            builder.setSystem(phoneObj.optString("system", "No data available"));
             builder.setScreenSize(phoneObj.optDouble("screen_size", -1));
-            builder.setScreenResolution(phoneObj.optString("screen_resolution", "No data"));
+            builder.setScreenResolution(phoneObj.optString("screen_resolution", "No data available"));
             builder.setBatteryCapacity(phoneObj.optInt("battery_capacity", -1));
-            builder.setTalkTime(phoneObj.optInt("talk_time", -1));
+            builder.setTalkTime(phoneObj.optDouble("talk_time", -1));
             builder.setCameraMegapixels(phoneObj.optDouble("camera_megapixels", -1));
-            builder.setPrice(phoneObj.optDouble("price", -1));
+            builder.setPrice(phoneObj.optInt("price", -1));
             builder.setWeight(phoneObj.optDouble("weight", -1));
-            builder.setStorageOptions(phoneObj.optString("storage_options", "No data"));
-            builder.setDimensions(phoneObj.optString("dimensions", "No data"));
-            builder.setCarrier(phoneObj.optString("carrier", "No data"));
-            builder.setNetworkFrequencies(phoneObj.optString("network_frequencies", "No data"));
+            builder.setStorageOptions(phoneObj.optString("storage_options", "No data available"));
+            builder.setDimensions(phoneObj.optString("dimensions", "No data available"));
+            builder.setCarrier(phoneObj.optString("carrier", "No data available"));
+            builder.setNetworkFrequencies(phoneObj.optString("network_frequencies", "No data available"));
             builder.setImage(phoneObj.optString("image", null));
             return builder.createPhone();
         } catch (JSONException e) {

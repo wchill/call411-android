@@ -16,17 +16,12 @@
 
 package com.androchill.call411;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.StateListDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.androchill.call411.ui.AnimatorListener;
@@ -65,33 +60,6 @@ public class DetailActivity extends AbstractDetailActivity {
         // Setup the alpha values here for Gingerbread support
         ViewHelper.setAlpha(infoContainer, 0);
         ViewHelper.setAlpha(container, 0);
-
-        animatedHero.setImageBitmap(photo);
-    }
-
-    @Override
-    public void colorButton(int id, int bgColor, int tintColor) {
-        ImageButton buttonView = (ImageButton) findViewById(id);
-
-        StateListDrawable bg = new StateListDrawable();
-        ShapeDrawable normal = new ShapeDrawable(new OvalShape());
-        normal.getPaint().setColor(bgColor);
-        ShapeDrawable pressed = new ShapeDrawable(new OvalShape());
-        pressed.getPaint().setColor(tintColor);
-        bg.addState(new int[] {android.R.attr.state_pressed}, pressed);
-        bg.addState(new int[]{}, normal);
-        Utils.setBackgroundCompat(buttonView, bg);
-    }
-
-    private Bitmap setupPhoto(int resource) {
-        Bitmap bitmap = MainActivity.sPhotoCache.get(resource);
-        hero.setImageBitmap(bitmap);
-        animatedHero.setImageBitmap(bitmap);
-        return bitmap;
-    }
-
-    public void toggleInformationView(View view) {
-
     }
 
     @Override
@@ -209,5 +177,4 @@ public class DetailActivity extends AbstractDetailActivity {
         // custom one
         overridePendingTransition(0, 0);
     }
-
 }

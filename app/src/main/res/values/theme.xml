@@ -49,7 +49,7 @@
 
     <style name="DetailActionBar" parent="@style/Widget.AppCompat.Light.ActionBar">
         <item name="background">@null</item>
-        <item name="homeAsUpIndicator">@drawable/ic_ab_up_white</item>
+        <item name="homeAsUpIndicator">@drawable/ic_ab_up_black</item>
         <item name="displayOptions">homeAsUp</item>
     </style>
 </resources>

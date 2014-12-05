@@ -2,21 +2,21 @@ package com.androchill.call411.utils;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.Log;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import com.androchill.call411.R;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.util.List;
 
 public class DownloadAllPhonesLoader extends AsyncTaskLoader<List<Phone>> {
 
-    public static final String ALL_PHONES_URL = "http://intense.io:8000/api/v1/allPhones";
+    //public static final String ALL_PHONES_URL = "http://intense.io:8000/api/v1/allPhones";
     private boolean dataIsReady = false;
     private List<Phone> data = null;
 
@@ -27,25 +27,29 @@ public class DownloadAllPhonesLoader extends AsyncTaskLoader<List<Phone>> {
     @Override
     public List<Phone> loadInBackground() {
         Log.d("Download phones", "Downloading started");
-        DefaultHttpClient client = new DefaultHttpClient();
-        HttpGet httpGet = new HttpGet(ALL_PHONES_URL);
+        //HttpURLConnection urlConnection = null;
         try {
-            HttpResponse execute = client.execute(httpGet);
-            InputStream content = execute.getEntity().getContent();
-            BufferedReader br = new BufferedReader(new InputStreamReader(content));
-            String s = "";
-            String response = "";
+//            URL url = new URL(ALL_PHONES_URL);
+//            urlConnection = (HttpURLConnection) url.openConnection();
+//            urlConnection.setUseCaches(true);
+//            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+
+            Resources res = getContext().getResources();
+            InputStream in = res.openRawResource(R.raw.allphones);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String s;
+            StringBuilder sb = new StringBuilder();
             while((s = br.readLine()) != null) {
-                response += s;
+                sb.append(s);
             }
             Log.d("Download phones", "Downloading complete");
-            data = PhoneJSONParser.parseArray(response);
+            data = PhoneJSONParser.parseArray(sb.toString());
             dataIsReady = true;
-            return data;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return data;
     }
 
     @Override

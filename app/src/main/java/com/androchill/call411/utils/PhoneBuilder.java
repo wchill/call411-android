@@ -9,9 +9,9 @@ public class PhoneBuilder {
     private double screen_size = -1;
     private String screen_resolution;
     private int battery_capacity = -1;
-    private int talk_time = -1;
+    private double talk_time = -1;
     private double camera_megapixels = -1;
-    private double price = -1;
+    private int price = -1;
     private double weight = -1;
     private String storage_options;
     private String dimensions;
@@ -59,7 +59,7 @@ public class PhoneBuilder {
         return this;
     }
 
-    public PhoneBuilder setTalkTime(int talk_time) {
+    public PhoneBuilder setTalkTime(double talk_time) {
         this.talk_time = talk_time;
         return this;
     }
@@ -69,7 +69,7 @@ public class PhoneBuilder {
         return this;
     }
 
-    public PhoneBuilder setPrice(double price) {
+    public PhoneBuilder setPrice(int price) {
         this.price = price;
         return this;
     }

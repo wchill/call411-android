@@ -16,14 +16,11 @@
 
 package com.androchill.call411;
 
-import android.annotation.TargetApi;
-import android.app.ActivityOptions;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Build;
+import android.net.http.HttpResponseCache;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,8 +28,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.androchill.call411.ui.Utils;
@@ -46,6 +43,7 @@ import com.nineoldandroids.view.ViewPropertyAnimator;
 import org.lucasr.twowayview.ItemClickSupport;
 import org.lucasr.twowayview.ItemClickSupport.OnItemClickListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,6 +87,7 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
         }
         List<Phone> data = PhoneJSONParser.parseArray(text.toString());
         */
+
         mAdapter = new PhoneViewAdapter(this, new ArrayList<Phone>());
         mRecyclerView.setAdapter(mAdapter);
         final ItemClickSupport itemClick = ItemClickSupport.addTo(mRecyclerView);
@@ -98,8 +97,7 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
             public void onItemClick(RecyclerView parent, View child, int position, long id) {
                 PhoneViewAdapter adapter = (PhoneViewAdapter) parent.getAdapter();
                 Phone p = adapter.getPhoneAt(position);
-                //showPhoto(child, p);
-                Toast.makeText(MainActivity.this, "Item clicked: " + p.getModelNumber(), Toast.LENGTH_SHORT).show();
+                showPhoto(child, p);
             }
         });
         /*
@@ -116,7 +114,18 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
             }
         });
         */
+        enableHttpResponseCache();
         getLoaderManager().initLoader(1, null, this);
+    }
+
+    private void enableHttpResponseCache() {
+        try {
+            long httpCacheSize = 25 * 1024 * 1024; // 10 MiB
+            File httpCacheDir = new File(getCacheDir(), "http");
+            HttpResponseCache.install(httpCacheDir, httpCacheSize);
+        } catch (Exception httpResponseCacheNotAvailable) {
+            Log.d("MainActivity", "HTTP response cache is unavailable.");
+        }
     }
 
     @Override
@@ -131,20 +140,6 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
     }
 
     /**
-     * Loads drawables into the given image view efficiently. Uses the method described
-     * <a href="http://developer.android.com/training/displaying-bitmaps/load-bitmap.html">here.</a>
-     *
-     * @param imageView
-     * @param resId     Resource identifier of the drawable to load from memory
-     */
-    private void setImageBitmap(ImageView imageView, int resId) {
-        Bitmap bitmap = Utils.decodeSampledBitmapFromResource(getResources(),
-                resId, imageView.getMeasuredWidth(), imageView.getMeasuredHeight());
-        sPhotoCache.put(resId, bitmap);
-        imageView.setImageBitmap(bitmap);
-    }
-
-    /**
      * When the user clicks a thumbnail, bundle up information about it and launch the
      * details activity.
      */
@@ -152,33 +147,12 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
         Intent intent = new Intent();
         intent.setClass(this, DetailActivity.class);
 
-        // Interesting data to pass across are the thumbnail location, the map parameters,
-        // the picture title & description, and the key to retrieve the bitmap from the cache
-        intent.putExtra("title", phone.getModelNumber())
-              .putExtra("description", phone.toString())
-              .putExtra("photo", R.drawable.photo1);
-//        if (Utils.hasLollipop()) {
-//            startActivityLollipop(view, intent);
-//        } else {
-            startActivityGingerBread(view, intent);
-//        }
+        intent.putExtra("phone", phone);
+        lastViewed = view;
+        startPhoneActivity(view, intent);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void startActivityLollipop(View view, Intent intent) {
-        intent.setClass(this, DetailActivityL.class);
-        ImageView hero = (ImageView) ((View) view.getParent()).findViewById(R.id.photo);
-        ((ViewGroup) hero.getParent()).setTransitionGroup(false);
-
-        sPhotoCache.put(intent.getIntExtra("photo", -1),
-                ((BitmapDrawable) hero.getDrawable()).getBitmap());
-
-        ActivityOptions options =
-                ActivityOptions.makeSceneTransitionAnimation(this, hero, "photo_hero");
-        startActivity(intent, options.toBundle());
-    }
-
-    private void startActivityGingerBread(View view, Intent intent) {
+    private void startPhoneActivity(View view, Intent intent) {
         int[] screenLocation = new int[2];
         view.getLocationOnScreen(screenLocation);
         intent.
@@ -208,11 +182,15 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<List<Phone>> loader, final List<Phone> data) {
+        ProgressBar progress = (ProgressBar) findViewById(R.id.progress);
+        progress.setVisibility(View.GONE);
         if(data == null) {
             Log.d("Download phones", "Null result");
+            Toast.makeText(this, "Failed to load phone database!", Toast.LENGTH_SHORT).show();
         } else {
             Log.d("Download phones", "Load finished");
             mAdapter.setDataset(data);
+            Toast.makeText(this, "Loaded " + data.size() + " phones", Toast.LENGTH_SHORT).show();
         }
     }
 
