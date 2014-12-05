@@ -16,6 +16,7 @@
 
 package com.androchill.call411;
 
+import android.app.LoaderManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -34,7 +35,11 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.squareup.picasso.Transformation;
 
-public abstract class AbstractDetailActivity extends ActionBarActivity implements Target {
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+
+public abstract class AbstractDetailActivity extends ActionBarActivity implements Target, LoaderManager.LoaderCallbacks<List<Phone>> {
 
     public ImageView hero;
     public Bitmap photo;
@@ -97,6 +102,7 @@ public abstract class AbstractDetailActivity extends ActionBarActivity implement
         postCreate();
 
         setupEnterAnimation();
+        getLoaderManager().initLoader(2, null, this);
     }
 
     public abstract void postCreate();
@@ -165,7 +171,8 @@ public abstract class AbstractDetailActivity extends ActionBarActivity implement
         if(phone.getScreenSize() < 0) {
             screenSizeView.setText("No data available");
         } else {
-            screenSizeView.setText(Double.toString(phone.getScreenSize()) + " inches");
+            String scText = new BigDecimal(phone.getScreenSize()).setScale(2, RoundingMode.HALF_EVEN).toString();
+            screenSizeView.setText(scText + " inches");
         }
         screenResolutionView.setText(phone.getScreenResolution());
         if(phone.getBatteryCapacity() < 0) {
@@ -181,7 +188,8 @@ public abstract class AbstractDetailActivity extends ActionBarActivity implement
         if(phone.getCameraMegapixels() < 0) {
             cameraMegapixelsView.setText("No data available");
         } else {
-            cameraMegapixelsView.setText(Double.toString(phone.getCameraMegapixels()) + " megapixels");
+            String mpText = new BigDecimal(phone.getCameraMegapixels()).setScale(2, RoundingMode.HALF_EVEN).toString();
+            cameraMegapixelsView.setText(mpText + " megapixels");
         }
         if(phone.getPrice() < 0) {
             priceView.setText("No data available");

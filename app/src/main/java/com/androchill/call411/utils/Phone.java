@@ -162,7 +162,7 @@ public class Phone implements Parcelable {
     public String getImageUrl() {
         if(this.image == null) {
             Log.d("Phone", "no URL");
-            return "http://placehold.it/300";
+            return "http://intense.io:8000/static/images/placeholder.gif";
         } else {
             Log.d("Phone", this.image);
         }

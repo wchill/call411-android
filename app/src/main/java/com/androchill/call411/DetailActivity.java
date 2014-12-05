@@ -16,20 +16,29 @@
 
 package com.androchill.call411;
 
+import android.content.Loader;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androchill.call411.ui.AnimatorListener;
 import com.androchill.call411.ui.SpotlightView;
 import com.androchill.call411.ui.Utils;
+import com.androchill.call411.utils.DownloadAllPhonesLoader;
+import com.androchill.call411.utils.DownloadSuggestedPhoneLoader;
+import com.androchill.call411.utils.Phone;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
+
+import java.util.List;
 
 public class DetailActivity extends AbstractDetailActivity {
 
@@ -84,25 +93,26 @@ public class DetailActivity extends AbstractDetailActivity {
         // Retrieve the data we need for the picture to display and
         // the thumbnail to animate it from
         Bundle bundle = getIntent().getExtras();
-        final int thumbnailTop = bundle.getInt("top");
-        final int thumbnailLeft = bundle.getInt("left");
-        final int thumbnailWidth = bundle.getInt("width");
-        final int thumbnailHeight = bundle.getInt("height");
+        if(bundle.getInt("top", -1) != -1) {
+            final int thumbnailTop = bundle.getInt("top");
+            final int thumbnailLeft = bundle.getInt("left");
+            final int thumbnailWidth = bundle.getInt("width");
+            final int thumbnailHeight = bundle.getInt("height");
 
-        // Scale factors to make the large version the same size as the thumbnail
-        float mWidthScale = (float) thumbnailWidth / animatedHero.getWidth();
-        float mHeightScale = (float) thumbnailHeight / animatedHero.getHeight();
+            // Scale factors to make the large version the same size as the thumbnail
+            float mWidthScale = (float) thumbnailWidth / animatedHero.getWidth();
+            float mHeightScale = (float) thumbnailHeight / animatedHero.getHeight();
 
-        // Set starting values for properties we're going to animate. These
-        // values scale and position the full size version down to the thumbnail
-        // size/location, from which we'll animate it back up
-        ViewHelper.setPivotX(animatedHero, 0);
-        ViewHelper.setPivotY(animatedHero, 0);
-        ViewHelper.setScaleX(animatedHero, mWidthScale);
-        ViewHelper.setScaleY(animatedHero, mHeightScale);
-        ViewHelper.setTranslationX(animatedHero, thumbnailLeft);
-        ViewHelper.setTranslationY(animatedHero, thumbnailTop);
-
+            // Set starting values for properties we're going to animate. These
+            // values scale and position the full size version down to the thumbnail
+            // size/location, from which we'll animate it back up
+            ViewHelper.setPivotX(animatedHero, 0);
+            ViewHelper.setPivotY(animatedHero, 0);
+            ViewHelper.setScaleX(animatedHero, mWidthScale);
+            ViewHelper.setScaleY(animatedHero, mHeightScale);
+            ViewHelper.setTranslationX(animatedHero, thumbnailLeft);
+            ViewHelper.setTranslationY(animatedHero, thumbnailTop);
+        }
         // Animate scale and translation to go from thumbnail to full size
         ViewPropertyAnimator.animate(animatedHero).
                 scaleX(1).scaleY(1).
@@ -138,6 +148,7 @@ public class DetailActivity extends AbstractDetailActivity {
      */
     public void runExitAnimation() {
         Bundle bundle = getIntent().getExtras();
+        if(bundle.getInt("top", -1) == -1) finish();
         final int thumbnailTop = bundle.getInt("top");
         final int thumbnailLeft = bundle.getInt("left");
         final int thumbnailWidth = bundle.getInt("width");
@@ -176,5 +187,36 @@ public class DetailActivity extends AbstractDetailActivity {
         // Override transitions: we don't want the normal window animation in addition to our
         // custom one
         overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public Loader<List<Phone>> onCreateLoader(int id, Bundle args) {
+        return new DownloadSuggestedPhoneLoader(this, phone);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<Phone>> loader, List<Phone> data) {
+        if(data == null) {
+            Log.d("Download phones", "Null result");
+            Toast.makeText(this, "Failed to load phone suggestions!", Toast.LENGTH_SHORT).show();
+        } else {
+            Log.d("Download phones", "Load finished");
+            Log.d("Similar phones", data.toString());
+            TextView suggested = (TextView) findViewById(R.id.suggested_phones);
+            if(data.size() == 0) {
+                suggested.setText("No phone suggestions");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                for(int i = 0; i < 10 && i < data.size(); i++) {
+                    sb.append(data.get(i).getModelNumber() + "\n");
+                }
+                suggested.setText(sb.toString());
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<Phone>> loader) {
+
     }
 }

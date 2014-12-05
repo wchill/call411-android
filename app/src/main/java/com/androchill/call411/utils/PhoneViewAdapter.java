@@ -1,13 +1,8 @@
 package com.androchill.call411.utils;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.LruCache;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +10,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androchill.call411.R;
-import com.androchill.call411.ui.Utils;
 import com.makeramen.RoundedImageView;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Request;
 
 import java.util.List;
 
